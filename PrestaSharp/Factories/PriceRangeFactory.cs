@@ -7,8 +7,8 @@ namespace Bukimedia.PrestaSharp.Factories
         protected override string singularEntityName { get { return "price_range"; } }
         protected override string pluralEntityName { get { return "price_ranges"; } }
 
-        public PriceRangeFactory(string BaseUrl, string Account, string SecretKey)
-            : base(BaseUrl, Account, SecretKey)
+        public PriceRangeFactory(string BaseUrl, string Account, string SecretKey, int? shopId = null)
+                : base(BaseUrl, Account, SecretKey, shopId)
         {
         }
     }

@@ -14,9 +14,9 @@ namespace Bukimedia.PrestaSharp.Factories
         protected override string singularEntityName { get { return "carrier"; } }
         protected override string pluralEntityName { get { return "carriers"; } }
 
-        public CarrierFactory(string BaseUrl, string Account, string SecretKey)
-            : base(BaseUrl, Account, SecretKey)
+        public CarrierFactory(string BaseUrl, string Account, string SecretKey, int? shopId)
+                : base(BaseUrl, Account, SecretKey, shopId)
         {
-        }    
+        }
     }
 }

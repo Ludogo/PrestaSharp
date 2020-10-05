@@ -17,19 +17,26 @@ namespace Bukimedia.PrestaSharp.Factories
         protected string BaseUrl { get; set; }
         protected string Account { get; set; }
         protected string Password { get; set; }
+        public int? ShopId { get; }
 
-        public RestSharpFactory(string baseUrl, string account, string password)
+        public RestSharpFactory(string baseUrl, string account, string password, int? shopId)
         {
             BaseUrl = baseUrl;
             Account = account;
             Password = password;
+            ShopId = shopId;
         }
 
         #region Privates
 
-        private void AddWsKey(RestRequest request)
+        private void AddRequestParameter(RestRequest request)
         {
-            request.AddParameter("ws_key", Account, ParameterType.QueryString); // used on every request
+            request.AddParameter("ws_key", Account, ParameterType.QueryString); // used on every request 
+            if (ShopId.HasValue)
+            {
+                request.AddQueryParameter("id_shop", ShopId.Value.ToString());
+            }
+
         }
 
         private void AddBody(RestRequest request, IEnumerable<PrestaShopEntity> entities)
@@ -38,14 +45,14 @@ namespace Bukimedia.PrestaSharp.Factories
             request.XmlSerializer = new PrestaSharpSerializer();
             var serialized = string.Empty;
             foreach (var entity in entities)
-                serialized += ((PrestaSharpSerializer) request.XmlSerializer).PrestaSharpSerialize(entity);
+                serialized += ((PrestaSharpSerializer)request.XmlSerializer).PrestaSharpSerialize(entity);
             serialized = "<prestashop>\n" + serialized + "\n</prestashop>";
             request.AddParameter("application/xml", serialized, ParameterType.RequestBody);
         }
 
         private void AddBody(RestRequest request, PrestaShopEntity entity)
         {
-            AddBody(request, new List<PrestaShopEntity> {entity});
+            AddBody(request, new List<PrestaShopEntity> { entity });
         }
 
         private void AddHandlers(RestClient client)
@@ -87,7 +94,7 @@ namespace Bukimedia.PrestaSharp.Factories
             {
                 BaseUrl = new Uri(BaseUrl)
             };
-            AddWsKey(request);
+            AddRequestParameter(request);
             AddHandlers(client);
             var response = client.Execute<T>(request);
             CheckResponse(response, request);
@@ -100,7 +107,7 @@ namespace Bukimedia.PrestaSharp.Factories
             {
                 BaseUrl = new Uri(BaseUrl)
             };
-            AddWsKey(request);
+            AddRequestParameter(request);
             AddHandlers(client);
             var response = client.Execute<T>(request);
             CheckResponse(response, request);
@@ -113,11 +120,11 @@ namespace Bukimedia.PrestaSharp.Factories
             {
                 BaseUrl = new Uri(BaseUrl)
             };
-            AddWsKey(request);
+            AddRequestParameter(request);
             var response = client.Execute<T>(request);
             var xDcoument = XDocument.Parse(response.Content);
             var ids = (from doc in xDcoument.Descendants(rootElement)
-                select long.Parse(doc.Attribute("id").Value)).ToList();
+                       select long.Parse(doc.Attribute("id").Value)).ToList();
             return ids;
         }
 
@@ -125,18 +132,18 @@ namespace Bukimedia.PrestaSharp.Factories
         {
             var client = new RestClient();
             client.BaseUrl = new Uri(BaseUrl);
-            AddWsKey(request);
+            AddRequestParameter(request);
             var response = client.Execute(request);
             CheckResponse(response, request);
             return response.RawBytes;
-        }        
+        }
 
         protected async Task<T> ExecuteAsync<T>(RestRequest request) where T : new()
         {
             var client = new RestClient(BaseUrl);
-            AddWsKey(request);
+            AddRequestParameter(request);
             AddHandlers(client);
-            var response = await client.ExecuteTaskAsync<T>(request);
+            var response = await client.ExecuteAsync<T>(request);
             CheckResponse(response, request);
             return response.Data;
         }
@@ -144,8 +151,8 @@ namespace Bukimedia.PrestaSharp.Factories
         protected async Task<List<long>> ExecuteForGetIdsAsync<T>(RestRequest request, string rootElement) where T : new()
         {
             var client = new RestClient(BaseUrl);
-            AddWsKey(request);
-            var response = await client.ExecuteTaskAsync<T>(request);
+            AddRequestParameter(request);
+            var response = await client.ExecuteAsync<T>(request);
             CheckResponse(response, request);
             var xDcoument = XDocument.Parse(response.Content);
             var ids = xDcoument.Descendants(rootElement).Select(doc => long.Parse(doc.Attribute("id").Value)).ToList();
@@ -154,8 +161,8 @@ namespace Bukimedia.PrestaSharp.Factories
         protected async Task<byte[]> ExecuteForImageAsync(RestRequest request)
         {
             var client = new RestClient(BaseUrl);
-            AddWsKey(request);
-            var response = await client.ExecuteTaskAsync(request);
+            AddRequestParameter(request);
+            var response = await client.ExecuteAsync(request);
             CheckResponse(response, request);
             return response.RawBytes;
         }
@@ -353,7 +360,7 @@ namespace Bukimedia.PrestaSharp.Factories
         {
             var fileStream = new FileStream(imagePath, FileMode.Open, FileAccess.Read);
             var buffer = new byte[fileStream.Length];
-            fileStream.Read(buffer, 0, (int) fileStream.Length);
+            fileStream.Read(buffer, 0, (int)fileStream.Length);
             fileStream.Close();
             return buffer;
         }

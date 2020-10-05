@@ -14,8 +14,8 @@ namespace Bukimedia.PrestaSharp.Factories
         protected override string singularEntityName { get { return "message"; } }
         protected override string pluralEntityName { get { return "messages"; } }
 
-        public MessageFactory(string BaseUrl, string Account, string SecretKey)
-            : base(BaseUrl, Account, SecretKey)
+        public MessageFactory(string BaseUrl, string Account, string SecretKey, int? shopId = null)
+                : base(BaseUrl, Account, SecretKey, shopId)
         {
         }
     }

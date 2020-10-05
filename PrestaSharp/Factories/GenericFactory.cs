@@ -13,7 +13,7 @@ namespace Bukimedia.PrestaSharp.Factories
         protected abstract string singularEntityName { get; }
         protected abstract string pluralEntityName { get; }
 
-        public GenericFactory(string BaseUrl, string Account, string Password) : base(BaseUrl, Account, Password)
+        public GenericFactory(string BaseUrl, string Account, string Password, int? shopId) : base(BaseUrl, Account, Password, shopId)
         {
         }
 

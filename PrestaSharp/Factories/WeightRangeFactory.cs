@@ -7,8 +7,8 @@ namespace Bukimedia.PrestaSharp.Factories
         protected override string singularEntityName { get { return "weight_range"; } }
         protected override string pluralEntityName { get { return "weight_ranges"; } }
 
-        public WeightRangeFactory(string BaseUrl, string Account, string SecretKey)
-            : base(BaseUrl, Account, SecretKey)
+        public WeightRangeFactory(string BaseUrl, string Account, string SecretKey, int? shopId = null)
+                : base(BaseUrl, Account, SecretKey, shopId)
         {
         }
     }
